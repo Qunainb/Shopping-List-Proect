@@ -6,6 +6,8 @@ const itemList = document.getElementById("item-list");
 
 const clrBtn = document.getElementById("clear");
 
+const itemFilter = document.getElementById("filter");
+
 function addItem(event) {
   event.preventDefault();
 
@@ -26,6 +28,8 @@ function addItem(event) {
 
   itemList.appendChild(li);
 
+  checkUi();
+
   itemInput.value = "";
 }
 
@@ -45,7 +49,11 @@ function createIcon(classes) {
 
 function removeItem(event) {
   if (event.target.parentElement.classList.contains("remove-item")) {
-    event.target.parentElement.parentElement.remove();
+    if (confirm("Are you sure?")) {
+      event.target.parentElement.parentElement.remove();
+
+      checkUi();
+    }
   }
 }
 
@@ -53,9 +61,40 @@ function clearItems() {
   while (itemList.firstChild) {
     itemList.removeChild(itemList.firstChild);
   }
+  checkUi();
+}
+
+function checkUi() {
+  const items = document.querySelectorAll("li");
+
+  if (items.length === 0) {
+    clrBtn.style.display = "none";
+    itemFilter.style.display = "none";
+  } else {
+    clrBtn.style.display = "block";
+    itemFilter.style.display = "block";
+  }
+}
+
+function filterItems(event) {
+  const items = document.querySelectorAll("li");
+  const text = event.target.value.toLowerCase();
+
+  items.forEach((item) => {
+    const value = item.firstChild.textContent.toLocaleLowerCase();
+
+    if (value.indexOf(text) != -1) {
+      item.style.display = "flex";
+    } else {
+      item.style.display = "none";
+    }
+  });
 }
 
 // Event Listener
 itemForm.addEventListener("submit", addItem);
 itemList.addEventListener("click", removeItem);
 clrBtn.addEventListener("click", clearItems);
+itemFilter.addEventListener("input", filterItems);
+
+checkUi();
